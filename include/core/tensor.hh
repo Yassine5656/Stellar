@@ -10,7 +10,7 @@
 #include <random>
 #include <vector>
 
-namespace stellar {
+namespace stellar::core {
     using scalar_t = float;
 
     /**
@@ -23,28 +23,26 @@ namespace stellar {
          * @param length Number of columns
          * @brief General tensor constructor
          */
-        Tensor(const unsigned int size, const unsigned int length) : Tensor(
-            size, length, 0) {
+        Tensor(const unsigned int size,
+               const unsigned int length) : size_(size), length_(length),
+                                            elements_(size_ * length_) {
         }
 
         /**
          * @param size Dimension
          * @brief Square tensor constructor
          */
-        explicit Tensor(const unsigned int size) : Tensor(size, size, 0) {
+        explicit Tensor(const unsigned int size) : size_(size), length_(size),
+                                                   elements_(size_ * length_) {
         }
 
         /**
-         * @param other Matrix to copy
-         * @brief Copy tensor constructor
+         * @param other Matrix to move
+         * @brief Move tensor constructor
          */
-        Tensor(const Tensor &other) : size_(other.getSize()),
-                                      length_(other.getLength()) {
-            assert(size_ != 0 && length_ != 0);
-            for (unsigned int i = 0; i < size_; i++)
-                for (unsigned int j = 0; j < length_; j++)
-                    elements_.push_back(other.get(i, j));
-        }
+        Tensor(const Tensor &other) noexcept = default;
+
+        Tensor &operator=(Tensor &&) noexcept = default;
 
         /**
          * @param other Matrix to copy
@@ -54,23 +52,20 @@ namespace stellar {
          * @param column_begin First column to copy
          * @brief Copy sub-tensor constructor
          */
-        Tensor(const Tensor &other, const unsigned int size,
-               const unsigned int length, const unsigned int row_begin,
-               const unsigned int column_begin) : size_(size), length_(length),
-                                                  elements_(
-                                                      std::vector<scalar_t>(
-                                                          size * length)) {
-            assert(size_ != 0 && length_ != 0);
-            for (unsigned int i = 0; i < size; i++)
-                for (unsigned int j = 0; j < length; j++)
-                    elements_[i * length + j] = other.get(
-                        i + row_begin, j + column_begin);
-        }
+        Tensor(const Tensor &other, unsigned int size,
+               unsigned int length, unsigned int row_begin,
+               unsigned int column_begin);
 
+        /**
+         * @brief Return the number of tensor's rows
+         */
         [[nodiscard]] unsigned int getSize() const {
             return size_;
         }
 
+        /**
+         * @brief Return the number of tensor's columns
+         */
         [[nodiscard]] unsigned int getLength() const {
             return length_;
         }
@@ -113,40 +108,25 @@ namespace stellar {
         /**
          * @brief Tensor product by parallelism of calculations and cache optimization.
          */
-        void multiply(const Tensor &other) {
-            multiply(other, 0, size_);
-        }
+        void multiply(const Tensor &other);
 
         /**
          * @param scalar Scalar coefficient
          * @brief Tensor scalar product
          */
-        void multiplyScalar(int scalar);
+        void multiplyScalar(scalar_t scalar);
 
         /**
          * @param scalar New value
          * @brief Set all tensor elements to 'scalar'.
          */
-        void fill_constant(const scalar_t scalar) {
-            for (unsigned int i = 0; i < size_ * length_; i++)
-                elements_[i] = scalar;
-        }
+        void fill_constant(scalar_t scalar);
 
         /**
          * @param scalar New value
          * @brief Fill the main diagonal by 'scalar'.
          */
-        void fill_diagonal(const scalar_t scalar) {
-            // Assert square tensor
-            assert(size_ == length_);
-            for (unsigned int row = 0; row < size_; row++) {
-                for (unsigned col = 0; col < row; col++)
-                    elements_[row * length_ + col] = 0;
-                for (unsigned col = row + 1; col < length_; col++)
-                    elements_[row * length_ + col] = 0;
-                elements_[row * length_ + row] = scalar;
-            }
-        }
+        void fill_diagonal(scalar_t scalar);
 
         /**
          * @brief Transform tensor to identity.
@@ -169,12 +149,7 @@ namespace stellar {
          * @param end Last sequence element
          * @brief Fill tensor by an increasing sequence from begin to end
          */
-        void fill_sequence(const unsigned int begin, const unsigned int end) {
-            // Assert increasing sequence
-            assert(begin <= end);
-            for (unsigned int index = 0; index < size_ * length_; index++)
-                elements_[index] = static_cast<scalar_t>(begin + index % end);
-        }
+        void fill_sequence(int begin, unsigned int end);
 
         /**
          * @param min Min range
@@ -182,14 +157,7 @@ namespace stellar {
          * @param seed Seed random generator
          * @brief Fill tensor with random values followed by uniform distribution.
          */
-        void fill_uniform(const scalar_t min, const scalar_t max,
-                          const unsigned int seed) {
-            auto generator = std::mt19937(seed);
-            auto distribution = std::uniform_real_distribution(min, max);
-            for (unsigned int index = 0; index < size_ * length_; index++) {
-                elements_[index] = distribution(generator);
-            }
-        }
+        void fill_uniform(scalar_t min, scalar_t max, unsigned int seed);
 
         /**
          * @param mean Mean
@@ -197,40 +165,31 @@ namespace stellar {
          * @param seed Seed random generator
          * @brief Fill tensor with random values followed by normal distribution.
          */
-        void fill_normal(const scalar_t mean, const scalar_t stddev,
-                         const unsigned int seed) {
-            auto generator = std::mt19937(seed);
-            auto distribution = std::normal_distribution(mean, stddev);
-            for (unsigned int index = 0; index < size_ * length_; index++) {
-                elements_[index] = distribution(generator);
-            }
-        }
+        void fill_normal(scalar_t mean, scalar_t stddev, unsigned int seed);
 
         /**
          * @param seed Seed random generator
          * @brief Fill tensor with random values followed by uniform distribution and xavier limit.
          */
-        void fill_xavier_uniform(const unsigned int seed) {
-            const scalar_t xavier_scalar = std::sqrtf(
-                6.0f / static_cast<scalar_t>(size_ + length_));
-            #pragma omp parallel default(none) shared(xavier_scalar, seed)
-            {
-                const int thread_id = omp_get_thread_num();
-                auto generator = std::mt19937(seed + thread_id);
-                auto distribution = std::uniform_real_distribution(
-                    -xavier_scalar, xavier_scalar);
-                #pragma omp for
-                for (unsigned int index = 0; index < size_ * length_; index++) {
-                    elements_[index] = distribution(generator);
-                }
-            }
-        }
+        void fill_xavier_uniform(unsigned int seed);
+
+        /**
+         * @param seed Seed random generator
+         * @brief Fill tensor with random values followed by normal distribution and he standard deviation.
+         */
+        void fill_he_normal(unsigned int seed);
 
         /**
          * @brief Load the tensor from the binary file
          * @param filename Path of the binary file
          */
-        void fill_from_binary(std::string filename);
+        void fill_from_binary(const std::string& filename);
+
+        /**
+         * @brief Save the tensor in the binary file
+         * @param filename Path of the binary file
+         */
+        void save_to_binary(const std::string& filename) const;
 
         /**
          * @brief Print first/last rows/columns of tensor, with additional information.
@@ -261,28 +220,14 @@ namespace stellar {
          * @brief Check if NaN values are present in the tensor.
          * @param tensor Tensor
          */
-        static bool check_invalid(const Tensor &tensor);
+        static bool check_NaN_values(const Tensor &tensor);
+
+        void test_move();
 
     private:
         unsigned int size_;
         unsigned int length_;
         std::vector<scalar_t> elements_;
-
-        /**
-         * @param size Number of rows
-         * @param length Number of columns
-         * @param c Value to set
-         * @brief Private constructor, with default value elements initialization.
-         */
-        Tensor(const unsigned int size, const unsigned int length,
-               const scalar_t c)
-            : size_(size),
-              length_(length), elements_(std::vector(size * length, c)) {
-            assert(size_ != 0 && length_ != 0);
-        }
-
-        void multiply(Tensor other, unsigned int begin_row,
-                      unsigned int end_row);
     };
 }
 
