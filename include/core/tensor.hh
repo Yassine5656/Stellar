@@ -1,13 +1,8 @@
-//
-// Created by yassine on 2/12/26.
-//
-
 #ifndef TENSOR_H
 #define TENSOR_H
 
 #include <cassert>
-#include <omp.h>
-#include <random>
+#include <string>
 #include <vector>
 
 namespace stellar::core {
@@ -215,14 +210,6 @@ namespace stellar::core {
          * @brief Min of tensor elements
          */
         static scalar_t min(const Tensor &tensor);
-
-        /**
-         * @brief Check if NaN values are present in the tensor.
-         * @param tensor Tensor
-         */
-        static bool check_NaN_values(const Tensor &tensor);
-
-        void test_move();
 
     private:
         unsigned int size_;
