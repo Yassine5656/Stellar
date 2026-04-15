@@ -151,9 +151,10 @@ void Tensor::fill_sequence(const int begin, const unsigned int end)
     #pragma omp parallel for default(none) shared(begin, end) if (getLength() >= PARALLEL_THRESHOLD || getSize() >= PARALLEL_THRESHOLD)
     // clang-format on
     for (unsigned int index = 0; index < size_ * length_; index++)
+    {
         elements_[index] = static_cast<scalar_t>(
             begin + static_cast<int>(index % (end + 1)));
-}
+    }
 
 void Tensor::fill_uniform(const scalar_t min,
                           const scalar_t max,
