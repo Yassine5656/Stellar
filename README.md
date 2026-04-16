@@ -1,9 +1,9 @@
 # Stellar
 
-**Stellar** is a simplified **Large Language Model** (LLM), made from scratch* and written in **C++20**.
+**Stellar** is a simplified **Large Language Model** (LLM), made from scratch* and written in **C++20**, using OpenMP for parallelized computations.
 This project focuses on deep-learning, starting with a Tensor Library with an emphasis on CPU optimization.
 
-> ***Note:** The project currently uses OpenMP to do parallelized computations. It may change in a future version.*
+> ***Note:** The project currently uses OpenMP. It may change in a future update.*
 
 ## Key features
 
