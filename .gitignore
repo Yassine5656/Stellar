@@ -2,6 +2,9 @@
 .idea/
 build/
 build-cmake-debug/
+.vscode
+.cache
+compile_commands.json
 
 # Prerequisites
 *.d
