@@ -1,7 +1,7 @@
 # IDE
 .idea/
 build/
-build-cmake-debug/
+cmake-build-debug/
 .vscode
 .cache
 compile_commands.json

@@ -5,39 +5,44 @@
 #include <string>
 #include <vector>
 
-namespace stellar::core {
+namespace stellar::core
+{
     using scalar_t = float;
 
     /**
      * @brief Tensor class used for deep learning purposes.
      */
-    class Tensor {
-    public:
+    class Tensor
+    {
+      public:
         /**
          * @param size Number of rows
          * @param length Number of columns
          * @brief General tensor constructor
          */
-        Tensor(const unsigned int size,
-               const unsigned int length) : size_(size), length_(length),
-                                            elements_(size_ * length_) {
-        }
+        Tensor(const unsigned int size, const unsigned int length)
+          : size_(size)
+          , length_(length)
+          , elements_(size_ * length_)
+        {}
 
         /**
          * @param size Dimension
          * @brief Square tensor constructor
          */
-        explicit Tensor(const unsigned int size) : size_(size), length_(size),
-                                                   elements_(size_ * length_) {
-        }
+        explicit Tensor(const unsigned int size)
+          : size_(size)
+          , length_(size)
+          , elements_(size_ * length_)
+        {}
 
         /**
          * @param other Matrix to move
          * @brief Move tensor constructor
          */
-        Tensor(const Tensor &other) noexcept = default;
+        Tensor(const Tensor& other) noexcept = default;
 
-        Tensor &operator=(Tensor &&) noexcept = default;
+        Tensor& operator=(Tensor&&) noexcept = default;
 
         /**
          * @param other Matrix to copy
@@ -47,23 +52,21 @@ namespace stellar::core {
          * @param column_begin First column to copy
          * @brief Copy sub-tensor constructor
          */
-        Tensor(const Tensor &other, unsigned int size,
-               unsigned int length, unsigned int row_begin,
+        Tensor(const Tensor& other,
+               unsigned int size,
+               unsigned int length,
+               unsigned int row_begin,
                unsigned int column_begin);
 
         /**
          * @brief Return the number of tensor's rows
          */
-        [[nodiscard]] unsigned int getSize() const {
-            return size_;
-        }
+        [[nodiscard]] unsigned int getSize() const { return size_; }
 
         /**
          * @brief Return the number of tensor's columns
          */
-        [[nodiscard]] unsigned int getLength() const {
-            return length_;
-        }
+        [[nodiscard]] unsigned int getLength() const { return length_; }
 
         /**
          * @param row Row index
@@ -71,8 +74,8 @@ namespace stellar::core {
          * @brief Get the element of the row-th row and col-th column.
          * Indexes are zero-based.
          */
-        [[nodiscard]] scalar_t get(const unsigned int row,
-                                   const unsigned int col) const {
+        [[nodiscard]] scalar_t get(const unsigned int row, const unsigned int col) const
+        {
             assert(row < size_ && col < length_);
             return elements_[row * length_ + col];
         }
@@ -84,8 +87,8 @@ namespace stellar::core {
          * @brief Set a new element 'val' of the row-th row and col-th column.
          * Indexes are zero-based.
          */
-        void set(const unsigned int row, const unsigned int col,
-                 const scalar_t val) {
+        void set(const unsigned int row, const unsigned int col, const scalar_t val)
+        {
             assert(row < size_ && col < length_);
             elements_[row * length_ + col] = val;
         }
@@ -93,17 +96,17 @@ namespace stellar::core {
         /**
          * @brief Tensor addition by parallelism of calculations and cache optimization.
          */
-        void add(const Tensor &other);
+        void add(const Tensor& other);
 
         /**
          * @brief Tensor substraction by parallelism of calculations and cache optimization.
          */
-        void sub(const Tensor &other);
+        void sub(const Tensor& other);
 
         /**
          * @brief Tensor product by parallelism of calculations and cache optimization.
          */
-        void multiply(const Tensor &other);
+        void multiply(const Tensor& other);
 
         /**
          * @param scalar Scalar coefficient
@@ -127,9 +130,7 @@ namespace stellar::core {
          * @brief Transform tensor to identity.
          * Thus, the main diagonal is set to 1, and other elements to 0.
          */
-        void fill_identity() {
-            fill_diagonal(1);
-        }
+        void fill_identity() { fill_diagonal(1); }
 
         /**
          * @param scalar value to be set
@@ -194,28 +195,28 @@ namespace stellar::core {
         /**
          * @brief Sum of tensor elements
          */
-        static scalar_t sum(const Tensor &tensor);
+        static scalar_t sum(const Tensor& tensor);
 
         /**
          * @brief Mean of tensor elements
          */
-        static scalar_t mean(const Tensor &tensor);
+        static scalar_t mean(const Tensor& tensor);
 
         /**
          * @brief Max of tensor elements
          */
-        static scalar_t max(const Tensor &tensor);
+        static scalar_t max(const Tensor& tensor);
 
         /**
          * @brief Min of tensor elements
          */
-        static scalar_t min(const Tensor &tensor);
+        static scalar_t min(const Tensor& tensor);
 
-    private:
+      private:
         unsigned int size_;
         unsigned int length_;
         std::vector<scalar_t> elements_;
     };
-}
+} // namespace stellar::core
 
 #endif // ! TENSOR_H

@@ -1,11 +1,11 @@
-#include "../../include/core/tensor.hh"
+#include "core/tensor.hh"
 
 #include <bitset>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <omp.h>
 #include <random>
+#include <omp.h>
 
 #define MAX_ELM_RENDERED ((unsigned int)3)
 #define PADDING 10
@@ -20,9 +20,9 @@ Tensor::Tensor(const Tensor& other,
                const unsigned int length,
                const unsigned int row_begin,
                const unsigned int column_begin)
-    : size_(size)
-      , length_(length)
-      , elements_(size * length)
+  : size_(size)
+  , length_(length)
+  , elements_(size * length)
 {
     assert(size_ != 0 && length_ != 0);
     // clang-format off
@@ -30,8 +30,7 @@ Tensor::Tensor(const Tensor& other,
     // clang-format on
     for (unsigned int i = 0; i < size; i++)
         for (unsigned int j = 0; j < length; j++)
-            elements_[i * length + j] = other.get(
-                i + row_begin, j + column_begin);
+            elements_[i * length + j] = other.get(i + row_begin, j + column_begin);
 }
 
 void Tensor::add(const Tensor& other)
@@ -67,8 +66,8 @@ void Tensor::multiply(const Tensor& other)
         {
             const float temp = get(row, index);
             for (unsigned int column = 0; column < other.getLength(); column++)
-                result.elements_[row * result.getLength() + column] += temp *
-                    other.get(index, column);
+                result.elements_[row * result.getLength() + column] +=
+                  temp * other.get(index, column);
         }
     }
 
@@ -123,7 +122,9 @@ void Tensor::fill_triangular(const scalar_t scalar, const bool upper_section)
     #pragma omp parallel default(none) shared(scalar, upper_section, end_row) if (getLength() >= PARALLEL_THRESHOLD || getSize() >= PARALLEL_THRESHOLD)
     // clang-format on
     {
+        // clang-format off
         #pragma omp for
+        // clang-format on
         for (unsigned int row = 0; row < size_; row++)
         {
             for (unsigned int col = 0; col < row; col++)
@@ -152,13 +153,12 @@ void Tensor::fill_sequence(const int begin, const unsigned int end)
     // clang-format on
     for (unsigned int index = 0; index < size_ * length_; index++)
     {
-        elements_[index] = static_cast<scalar_t>(
-            begin + static_cast<int>(index % (end + 1)));
+        elements_[index] =
+          static_cast<scalar_t>(begin + static_cast<int>(index % (end + 1)));
     }
+}
 
-void Tensor::fill_uniform(const scalar_t min,
-                          const scalar_t max,
-                          const unsigned int seed)
+void Tensor::fill_uniform(const scalar_t min, const scalar_t max, const unsigned int seed)
 {
     // clang-format off
     #pragma omp parallel default(none) shared(min, max, seed) if (length_ >= PARALLEL_THRESHOLD || size_ >= PARALLEL_THRESHOLD)
@@ -167,7 +167,9 @@ void Tensor::fill_uniform(const scalar_t min,
         const int thread_id = omp_get_thread_num();
         auto generator      = std::mt19937(seed + thread_id);
         auto distribution   = std::uniform_real_distribution(min, max);
+        // clang-format off
         #pragma omp for
+        // clang-format on
         for (unsigned int index = 0; index < size_ * length_; index++)
         {
             elements_[index] = distribution(generator);
@@ -186,7 +188,9 @@ void Tensor::fill_normal(const scalar_t mean,
         const int thread_id = omp_get_thread_num();
         auto generator      = std::mt19937(seed + thread_id);
         auto distribution   = std::normal_distribution(mean, stddev);
+        // clang-format off
         #pragma omp for
+        // clang-format on
         for (unsigned int index = 0; index < size_ * length_; index++)
         {
             elements_[index] = distribution(generator);
@@ -196,17 +200,17 @@ void Tensor::fill_normal(const scalar_t mean,
 
 void Tensor::fill_xavier_uniform(const unsigned int seed)
 {
-    scalar_t xavier_scalar = std::sqrt(
-        6.0f / static_cast<scalar_t>(size_ + length_));
+    scalar_t xavier_scalar = std::sqrt(6.0f / static_cast<scalar_t>(size_ + length_));
     // clang-format off
     #pragma omp parallel default(none) shared(xavier_scalar, seed) if (length_ >= PARALLEL_THRESHOLD || size_ >= PARALLEL_THRESHOLD)
     // clang-format on
     {
         const int thread_id = omp_get_thread_num();
         auto generator      = std::mt19937(seed + thread_id);
-        auto distribution   = std::uniform_real_distribution(
-            -xavier_scalar, xavier_scalar);
+        auto distribution = std::uniform_real_distribution(-xavier_scalar, xavier_scalar);
+        // clang-format off
         #pragma omp for
+        // clang-format on
         for (unsigned int index = 0; index < size_ * length_; index++)
         {
             elements_[index] = distribution(generator);
@@ -224,7 +228,9 @@ void Tensor::fill_he_normal(const unsigned int seed)
         const int thread_id = omp_get_thread_num();
         auto generator      = std::mt19937(seed + thread_id);
         auto distribution   = std::normal_distribution<scalar_t>(0, he_scalar);
+        // clang-format off
         #pragma omp for
+        // clang-format on
         for (unsigned int index = 0; index < size_ * length_; index++)
         {
             elements_[index] = distribution(generator);
@@ -239,8 +245,8 @@ void Tensor::fill_from_binary(const std::string& filename)
     assert(file.is_open());
     if (!file.is_open())
     {
-        std::cerr << "fill_from_binary: File does not exist! Filepath: '" <<
-            filename << "'\n";
+        std::cerr << "fill_from_binary: File does not exist! Filepath: '" << filename
+                  << "'\n";
         return;
     }
 
@@ -254,8 +260,7 @@ void Tensor::fill_from_binary(const std::string& filename)
         std::stringstream token{line};
         while (token >> word)
         {
-            const auto scalar = std::bit_cast<scalar_t>(
-                std::stoi(word, nullptr, 2));
+            const auto scalar = std::bit_cast<scalar_t>(std::stoi(word, nullptr, 2));
             set(0, col, scalar);
             ++col;
         }
@@ -273,16 +278,15 @@ void Tensor::fill_from_binary(const std::string& filename)
         std::stringstream token{line};
         while (token >> word)
         {
-            const auto scalar = std::bit_cast<scalar_t>(
-                std::stoi(word, nullptr, 2));
+            const auto scalar = std::bit_cast<scalar_t>(std::stoi(word, nullptr, 2));
             set(row, curr_col, scalar);
             ++curr_col;
         }
         assert(curr_col == col);
         if (curr_col != col)
         {
-            std::cerr << "fill_from_binary: File format invalid! Filepath: '" <<
-                filename << "'\n";
+            std::cerr << "fill_from_binary: File format invalid! Filepath: '" << filename
+                      << "'\n";
             file.close();
             return;
         }
@@ -294,8 +298,8 @@ void Tensor::fill_from_binary(const std::string& filename)
 
 std::string scalar_t_to_binary_string(const scalar_t scalar)
 {
-    const auto bits = std::bit_cast<int32_t>(
-        static_cast<stellar::core::scalar_t>(scalar));
+    const auto bits =
+      std::bit_cast<int32_t>(static_cast<stellar::core::scalar_t>(scalar));
     return std::bitset<sizeof(stellar::core::scalar_t) * 8>(bits).to_string();
 }
 
@@ -342,18 +346,15 @@ void Tensor::dump() const
         unsigned int col = 1;
         for (; col < cols_rendered; col++)
         {
-            std::cout << ", " << std::setw(PADDING) << elements_[
-                row * length_ + col];
+            std::cout << ", " << std::setw(PADDING) << elements_[row * length_ + col];
         }
         if (length_ - cols_rendered > col)
         {
             std::cout << ", " << std::setw(PADDING) << "...";
         }
-        for (col = std::max(col, length_ - cols_rendered); col < length_; col
-             ++)
+        for (col = std::max(col, length_ - cols_rendered); col < length_; col++)
         {
-            std::cout << ", " << std::setw(PADDING) << elements_[
-                row * length_ + col];
+            std::cout << ", " << std::setw(PADDING) << elements_[row * length_ + col];
         }
         std::cout << "\n";
     }
@@ -370,33 +371,29 @@ void Tensor::dump() const
         {
             std::cout << ", " << std::setw(PADDING) << "...";
         }
-        for (col = std::max(col, length_ - cols_rendered); col < length_; col
-             ++)
+        for (col = std::max(col, length_ - cols_rendered); col < length_; col++)
         {
             std::cout << ", " << std::setw(PADDING) << "...";
         }
         std::cout << "\n";
     }
 
-    for (unsigned int row = std::max(rows_rendered, size_ - rows_rendered);
-         row < size_; row++)
+    for (unsigned int row = std::max(rows_rendered, size_ - rows_rendered); row < size_;
+         row++)
     {
         std::cout << std::setw(PADDING) << " " << elements_[row * length_];
         unsigned int col = 1;
         for (; col < cols_rendered; col++)
         {
-            std::cout << ", " << std::setw(PADDING) << elements_[
-                row * length_ + col];
+            std::cout << ", " << std::setw(PADDING) << elements_[row * length_ + col];
         }
         if (length_ - cols_rendered > col)
         {
             std::cout << ", " << std::setw(PADDING) << "...";
         }
-        for (col = std::max(col, length_ - cols_rendered); col < length_; col
-             ++)
+        for (col = std::max(col, length_ - cols_rendered); col < length_; col++)
         {
-            std::cout << ", " << std::setw(PADDING) << elements_[
-                row * length_ + col];
+            std::cout << ", " << std::setw(PADDING) << elements_[row * length_ + col];
         }
         std::cout << "\n";
     }
@@ -445,13 +442,16 @@ scalar_t Tensor::max(const Tensor& tensor)
     {
         scalar_t local_max = std::numeric_limits<scalar_t>::lowest();
 
+        // clang-format off
         #pragma omp for nowait
-        for (unsigned int index = 0; index < tensor.size_ * tensor.length_;
-             index++)
+        // clang-format on
+        for (unsigned int index = 0; index < tensor.size_ * tensor.length_; index++)
             if (local_max < tensor.elements_[index])
                 local_max = tensor.elements_[index];
 
+        // clang-format off
         #pragma omp critical
+        // clang-format on
         {
             if (local_max > max)
             {
@@ -473,13 +473,16 @@ scalar_t Tensor::min(const Tensor& tensor)
     {
         scalar_t local_min = std::numeric_limits<scalar_t>::max();
 
+        // clang-format off
         #pragma omp for nowait
-        for (unsigned int index = 0; index < tensor.size_ * tensor.length_;
-             index++)
+        // clang-format on
+        for (unsigned int index = 0; index < tensor.size_ * tensor.length_; index++)
             if (tensor.elements_[index] < local_min)
                 local_min = tensor.elements_[index];
 
+        // clang-format off
         #pragma omp critical
+        // clang-format on
         {
             if (local_min < min)
             {
