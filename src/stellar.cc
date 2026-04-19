@@ -43,8 +43,7 @@ const std::string menu = "Stellar menu:\n"
                          "\n"
                          "Choose a choice among the above list: ";
 
-const std::string error_menu =
-  "The choice must be a valid number among the menu list.\n";
+const std::string error_menu = "The choice must be a valid number among the menu list.\n";
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
