@@ -9,8 +9,8 @@ add_library(libstellar SHARED)
 target_sources(libstellar PRIVATE core/tensor.cc)
 
 target_include_directories(libstellar
-            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libstellar/include)
+            PUBLIC ${CMAKE_SOURCE_DIR}/include
+            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 find_package(OpenMP REQUIRED)
 target_link_libraries(libstellar PRIVATE OpenMP::OpenMP_CXX)
