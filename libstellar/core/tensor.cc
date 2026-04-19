@@ -44,8 +44,7 @@ Tensor::Tensor(const Tensor& other,
     // clang-format on
     for (unsigned int i = 0; i < size; i++)
         for (unsigned int j = 0; j < length; j++)
-            elements_[i * length + j] =
-              other.get(i + row_begin, j + column_begin);
+            elements_[i * length + j] = other.get(i + row_begin, j + column_begin);
 }
 
 void Tensor::add(const Tensor& other)
@@ -173,9 +172,7 @@ void Tensor::fill_sequence(const int begin, const unsigned int end)
     }
 }
 
-void Tensor::fill_uniform(const scalar_t min,
-                          const scalar_t max,
-                          const unsigned int seed)
+void Tensor::fill_uniform(const scalar_t min, const scalar_t max, const unsigned int seed)
 {
     // clang-format off
     #pragma omp parallel default(none) shared(min, max, seed) if (length_ >= PARALLEL_THRESHOLD || size_ >= PARALLEL_THRESHOLD)
@@ -217,16 +214,14 @@ void Tensor::fill_normal(const scalar_t mean,
 
 void Tensor::fill_xavier_uniform(const unsigned int seed)
 {
-    scalar_t xavier_scalar =
-      std::sqrt(6.0f / static_cast<scalar_t>(size_ + length_));
+    scalar_t xavier_scalar = std::sqrt(6.0f / static_cast<scalar_t>(size_ + length_));
     // clang-format off
     #pragma omp parallel default(none) shared(xavier_scalar, seed) if (length_ >= PARALLEL_THRESHOLD || size_ >= PARALLEL_THRESHOLD)
     // clang-format on
     {
         const int thread_id = omp_get_thread_num();
         auto generator      = std::mt19937(seed + thread_id);
-        auto distribution =
-          std::uniform_real_distribution(-xavier_scalar, xavier_scalar);
+        auto distribution = std::uniform_real_distribution(-xavier_scalar, xavier_scalar);
         // clang-format off
         #pragma omp for
         // clang-format on
@@ -264,8 +259,8 @@ void Tensor::fill_from_binary(const std::string& filename)
     assert(file.is_open());
     if (!file.is_open())
     {
-        std::cerr << "fill_from_binary: File does not exist! Filepath: '"
-                  << filename << "'\n";
+        std::cerr << "fill_from_binary: File does not exist! Filepath: '" << filename
+                  << "'\n";
         return;
     }
 
@@ -279,8 +274,7 @@ void Tensor::fill_from_binary(const std::string& filename)
         std::stringstream token{line};
         while (token >> word)
         {
-            const auto scalar =
-              std::bit_cast<scalar_t>(std::stoi(word, nullptr, 2));
+            const auto scalar = std::bit_cast<scalar_t>(std::stoi(word, nullptr, 2));
             set(0, col, scalar);
             ++col;
         }
@@ -298,16 +292,15 @@ void Tensor::fill_from_binary(const std::string& filename)
         std::stringstream token{line};
         while (token >> word)
         {
-            const auto scalar =
-              std::bit_cast<scalar_t>(std::stoi(word, nullptr, 2));
+            const auto scalar = std::bit_cast<scalar_t>(std::stoi(word, nullptr, 2));
             set(row, curr_col, scalar);
             ++curr_col;
         }
         assert(curr_col == col);
         if (curr_col != col)
         {
-            std::cerr << "fill_from_binary: File format invalid! Filepath: '"
-                      << filename << "'\n";
+            std::cerr << "fill_from_binary: File format invalid! Filepath: '" << filename
+                      << "'\n";
             file.close();
             return;
         }
@@ -367,8 +360,7 @@ void Tensor::dump() const
         unsigned int col = 1;
         for (; col < cols_rendered; col++)
         {
-            std::cout << ", " << std::setw(PADDING)
-                      << elements_[row * length_ + col];
+            std::cout << ", " << std::setw(PADDING) << elements_[row * length_ + col];
         }
         if (length_ - cols_rendered > col)
         {
@@ -376,8 +368,7 @@ void Tensor::dump() const
         }
         for (col = std::max(col, length_ - cols_rendered); col < length_; col++)
         {
-            std::cout << ", " << std::setw(PADDING)
-                      << elements_[row * length_ + col];
+            std::cout << ", " << std::setw(PADDING) << elements_[row * length_ + col];
         }
         std::cout << "\n";
     }
@@ -401,15 +392,14 @@ void Tensor::dump() const
         std::cout << "\n";
     }
 
-    for (unsigned int row = std::max(rows_rendered, size_ - rows_rendered);
-         row < size_; row++)
+    for (unsigned int row = std::max(rows_rendered, size_ - rows_rendered); row < size_;
+         row++)
     {
         std::cout << std::setw(PADDING) << " " << elements_[row * length_];
         unsigned int col = 1;
         for (; col < cols_rendered; col++)
         {
-            std::cout << ", " << std::setw(PADDING)
-                      << elements_[row * length_ + col];
+            std::cout << ", " << std::setw(PADDING) << elements_[row * length_ + col];
         }
         if (length_ - cols_rendered > col)
         {
@@ -417,8 +407,7 @@ void Tensor::dump() const
         }
         for (col = std::max(col, length_ - cols_rendered); col < length_; col++)
         {
-            std::cout << ", " << std::setw(PADDING)
-                      << elements_[row * length_ + col];
+            std::cout << ", " << std::setw(PADDING) << elements_[row * length_ + col];
         }
         std::cout << "\n";
     }
@@ -470,8 +459,7 @@ scalar_t Tensor::max(const Tensor& tensor)
         // clang-format off
         #pragma omp for nowait
         // clang-format on
-        for (unsigned int index = 0; index < tensor.size_ * tensor.length_;
-             index++)
+        for (unsigned int index = 0; index < tensor.size_ * tensor.length_; index++)
             if (local_max < tensor.elements_[index])
                 local_max = tensor.elements_[index];
 
@@ -502,8 +490,7 @@ scalar_t Tensor::min(const Tensor& tensor)
         // clang-format off
         #pragma omp for nowait
         // clang-format on
-        for (unsigned int index = 0; index < tensor.size_ * tensor.length_;
-             index++)
+        for (unsigned int index = 0; index < tensor.size_ * tensor.length_; index++)
             if (tensor.elements_[index] < local_min)
                 local_min = tensor.elements_[index];
 

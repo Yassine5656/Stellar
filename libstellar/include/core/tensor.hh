@@ -88,8 +88,7 @@ namespace stellar::core
          * @brief Get the element of the row-th row and col-th column.
          * Indexes are zero-based.
          */
-        [[nodiscard]] scalar_t get(const unsigned int row,
-                                   const unsigned int col) const
+        [[nodiscard]] scalar_t get(const unsigned int row, const unsigned int col) const
         {
             assert(row < size_ && col < length_);
             return elements_[row * length_ + col];
@@ -102,8 +101,7 @@ namespace stellar::core
          * @brief Set a new element 'val' of the row-th row and col-th column.
          * Indexes are zero-based.
          */
-        void
-        set(const unsigned int row, const unsigned int col, const scalar_t val)
+        void set(const unsigned int row, const unsigned int col, const scalar_t val)
         {
             assert(row < size_ && col < length_);
             elements_[row * length_ + col] = val;
