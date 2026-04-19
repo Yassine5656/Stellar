@@ -1,6 +1,16 @@
+// Copyright 2026 Yassine TLICH
 //
-// Created by yassine on 2/20/26.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <iostream>
 
@@ -9,14 +19,22 @@
 #define CLEAR_CONSOLE() std::cout << "\033[2J\033[H\n";
 
 const std::string logo = "\n\n"
-                         "\t\t\t\t\t\t\t\t $$$$$$\\    $$\\               $$\\ $$\\                     \n"
-                         "\t\t\t\t\t\t\t\t$$  __$$\\   $$ |              $$ |$$ |                    \n"
-                         "\t\t\t\t\t\t\t\t$$ /  \\__|$$$$$$\\    $$$$$$\\  $$ |$$ | $$$$$$\\   $$$$$$\\  \n"
-                         "\t\t\t\t\t\t\t\t\\$$$$$$\\  \\_$$  _|  $$  __$$\\ $$ |$$ | \\____$$\\ $$  __$$\\ \n"
-                         "\t\t\t\t\t\t\t\t \\____$$\\   $$ |    $$$$$$$$ |$$ |$$ | $$$$$$$ |$$ |  \\__|\n"
-                         "\t\t\t\t\t\t\t\t$$\\   $$ |  $$ |$$\\ $$   ____|$$ |$$ |$$  __$$ |$$ |      \n"
-                         "\t\t\t\t\t\t\t\t\\$$$$$$  |  \\$$$$  |\\$$$$$$$\\ $$ |$$ |\\$$$$$$$ |$$ |      \n"
-                         "\t\t\t\t\t\t\t\t \\______/    \\____/  \\_______|\\__|\\__| \\_______|\\__|      \n\n\n\n";
+                         "\t\t\t\t\t\t\t\t $$$$$$\\    $$\\               $$\\ "
+                         "$$\\                     \n"
+                         "\t\t\t\t\t\t\t\t$$  __$$\\   $$ |              $$ "
+                         "|$$ |                    \n"
+                         "\t\t\t\t\t\t\t\t$$ /  \\__|$$$$$$\\    $$$$$$\\  $$ "
+                         "|$$ | $$$$$$\\   $$$$$$\\  \n"
+                         "\t\t\t\t\t\t\t\t\\$$$$$$\\  \\_$$  _|  $$  __$$\\ $$ "
+                         "|$$ | \\____$$\\ $$  __$$\\ \n"
+                         "\t\t\t\t\t\t\t\t \\____$$\\   $$ |    $$$$$$$$ |$$ "
+                         "|$$ | $$$$$$$ |$$ |  \\__|\n"
+                         "\t\t\t\t\t\t\t\t$$\\   $$ |  $$ |$$\\ $$   ____|$$ "
+                         "|$$ |$$  __$$ |$$ |      \n"
+                         "\t\t\t\t\t\t\t\t\\$$$$$$  |  \\$$$$  |\\$$$$$$$\\ $$ "
+                         "|$$ |\\$$$$$$$ |$$ |      \n"
+                         "\t\t\t\t\t\t\t\t \\______/    \\____/  "
+                         "\\_______|\\__|\\__| \\_______|\\__|      \n\n\n\n";
 
 const std::string menu = "Stellar menu:\n"
                          "\t1.\n"
@@ -25,7 +43,8 @@ const std::string menu = "Stellar menu:\n"
                          "\n"
                          "Choose a choice among the above list: ";
 
-const std::string error_menu = "The choice must be a valid number among the menu list.\n";
+const std::string error_menu =
+  "The choice must be a valid number among the menu list.\n";
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
@@ -46,9 +65,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
             auto tensor = stellar::core::Tensor(25000, 25000);
             tensor.fill_uniform(-5.5, 18.2, 2);
             tensor.dump();
-            tensor.save_to_binary("/tmp/clembibi.bin");
+            tensor.save_to_binary("/tmp/tensor.bin");
             auto tensor_saved = stellar::core::Tensor(25000, 25000);
-            tensor_saved.fill_from_binary("/tmp/clembibi.bin");
+            tensor_saved.fill_from_binary("/tmp/tensor.bin");
             tensor_saved.dump();
             break;
         }

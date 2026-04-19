@@ -19,12 +19,16 @@ Besides, the project currently uses OpenMP. It may change in a future update.*
 
 ```text
 stellar/
-├── include/                      # API includes (headers)
-├── libstellar/                   # LLM Core implementation
-│   ├── include/                  # Private headers
+├── LICENSE
+├── NOTICE                  # Copyright & Librairies mentions
+├── README.md
+├── .clang-format
+├── include/                # API includes (headers)
+├── libstellar/             # LLM Core implementation
+│   ├── include/            # Private headers
 │   └── core/
-├── src/                          # Application EntryPoint (CLI)
-├── tests/                        # Unit tests
+├── src/                    # Application EntryPoint (CLI)
+├── tests/                  # Unit tests
 └── CMakeLists.txt
 ```
 
