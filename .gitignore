@@ -4,6 +4,7 @@ build/
 cmake-build-debug/
 .vscode
 .cache
+.clangd
 compile_commands.json
 
 # Prerequisites
