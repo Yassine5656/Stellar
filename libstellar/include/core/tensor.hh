@@ -227,7 +227,9 @@ namespace stellar::core
         static scalar_t min(const Tensor& tensor);
 
       private:
+        // Number of rows
         unsigned int size_;
+        // Number of columns
         unsigned int length_;
         std::vector<scalar_t> elements_;
     };
