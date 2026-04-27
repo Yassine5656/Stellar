@@ -32,11 +32,12 @@ target_include_directories(stellar
                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libstellar/include)
 
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
-    add_custom_target(copy_compile_commands ALL
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${CMAKE_BINARY_DIR}/compile_commands.json"
-                "${CMAKE_SOURCE_DIR}/compile_commands.json"
-            COMMENT "Copying 'compile_commands' to help LSP"
-            VERBATIM
-            )
+    add_custom_command(
+        OUTPUT "${CMAKE_SOURCE_DIR}/compile_commands.json"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/compile_commands.json"
+                                                      "${CMAKE_SOURCE_DIR}/compile_commands.json"
+        DEPENDS "${CMAKE_BINARY_DIR}/compile_commands.json"
+        COMMENT "Copying 'compile_commands' to source root"
+    )
+    add_custom_target(copy_compile_commands ALL DEPENDS "${CMAKE_SOURCE_DIR}/compile_commands.json")
 endif()
