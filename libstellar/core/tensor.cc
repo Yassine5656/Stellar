@@ -13,21 +13,34 @@
 // limitations under the License.
 
 #include "core/tensor.hh"
+#include "misc/misc.hh"
 
-#include <bitset>
+#include <array>
+#include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <random>
 #include <omp.h>
 
-#define MAX_ELM_RENDERED ((unsigned int)3)
-#define PADDING 10
-#define PRECISION_RENDERED 4
-
-constexpr unsigned int PARALLEL_THRESHOLD = 3000;
+#define STELLAR_ERROR(Os, Msg)                                                           \
+    stellar::misc::log_error(Os, __FILE__, __LINE__, __func__, Msg)
 
 using namespace stellar::core;
+
+static constexpr std::string_view MAGIC_NUMBER{"stellar"};
+constexpr unsigned int MAX_ELM_RENDERED   = 3;
+constexpr unsigned int PADDING            = 10;
+constexpr unsigned int PARALLEL_THRESHOLD = 3000;
+constexpr unsigned int PRECISION_RENDERED = 4;
+
+static inline void
+WRITE_STELLAR_HEADER(std::ostream& os, const unsigned int size, const unsigned int length)
+{
+    os << MAGIC_NUMBER << '\n';
+    os << size << '\n';
+    os << length << '\n';
+}
 
 Tensor::Tensor(const Tensor& other,
                const unsigned int size,
@@ -252,92 +265,93 @@ void Tensor::fill_he_normal(const unsigned int seed)
     }
 }
 
-void Tensor::fill_from_binary(const std::string& filename)
+bool check_magic_number(std::ifstream& os)
 {
-    assert(!filename.empty());
-    std::ifstream file{filename};
-    assert(file.is_open());
+    std::string line;
+    std::getline(os, line);
+
+    return line == MAGIC_NUMBER;
+}
+
+std::array<char, 4> scalar_t_to_bytes(const scalar_t scalar)
+{
+    std::array<char, 4> res;
+    std::memcpy(res.data(), &scalar, sizeof(scalar_t));
+    return res;
+}
+
+void Tensor::save_to_binary(const std::string& filename) const
+{
+    std::ofstream file{filename, std::ios::binary};
     if (!file.is_open())
     {
-        std::cerr << "fill_from_binary: File does not exist! Filepath: '" << filename
-                  << "'\n";
+        STELLAR_ERROR(std::cerr, "File doesn't exist. filename: '" + filename + "'\n");
         return;
     }
+    // Write stellar-format header
+    WRITE_STELLAR_HEADER(file, getSize(), getLength());
 
-    // FIXME: Check if it's a valid digit
-
-    std::string line;
-    unsigned int col = 0;
-    if (!getline(file, line).eof())
+    for (unsigned int row = 0; row < size_; ++row)
     {
-        std::string word;
-        std::stringstream token{line};
-        while (token >> word)
+        for (unsigned int column = 0; column < length_; ++column)
         {
-            const auto scalar = std::bit_cast<scalar_t>(std::stoi(word, nullptr, 2));
-            set(0, col, scalar);
-            ++col;
+            std::array<char, 4> binary_weight;
+            binary_weight = scalar_t_to_bytes(get(row, column));
+            for (unsigned int i = 0; i < 4; ++i)
+            {
+                file << binary_weight[i];
+            }
         }
-    }
-
-    unsigned int row = 1;
-    while (!getline(file, line).eof())
-    {
-        unsigned int curr_col = 0;
-        if (line.empty())
-        {
-            continue;
-        }
-        std::string word;
-        std::stringstream token{line};
-        while (token >> word)
-        {
-            const auto scalar = std::bit_cast<scalar_t>(std::stoi(word, nullptr, 2));
-            set(row, curr_col, scalar);
-            ++curr_col;
-        }
-        assert(curr_col == col);
-        if (curr_col != col)
-        {
-            std::cerr << "fill_from_binary: File format invalid! Filepath: '" << filename
-                      << "'\n";
-            file.close();
-            return;
-        }
-        ++row;
     }
 
     file.close();
 }
 
-std::string scalar_t_to_binary_string(const scalar_t scalar)
+void Tensor::fill_from_binary(const std::string& filename)
 {
-    const auto bits =
-      std::bit_cast<int32_t>(static_cast<stellar::core::scalar_t>(scalar));
-    return std::bitset<sizeof(stellar::core::scalar_t) * 8>(bits).to_string();
-}
-
-void Tensor::save_to_binary(const std::string& filename) const
-{
-    assert(!filename.empty());
-    std::ofstream file{filename};
-    assert(file.is_open());
+    std::ifstream file{filename, std::ios::binary};
     if (!file.is_open())
     {
-        std::cerr << "File doesn't exist. Filepath : '" << filename << "'\n";
+        STELLAR_ERROR(std::cerr, "File does not exist! Filename: '" + filename + "'\n");
         return;
     }
-
-    for (unsigned int row = 0; row < size_; ++row)
+    if (!check_magic_number(file))
     {
-        std::string binary_weight = scalar_t_to_binary_string(get(row, 0));
-        file << binary_weight;
-        for (unsigned int column = 1; column < length_; ++column)
+        STELLAR_ERROR(std::cerr, "Invalid Magic Number!\n");
+        file.close();
+        return;
+    }
+    std::string line;
+    std::getline(file, line);
+    const unsigned int rows = std::strtoul(line.data(), nullptr, 10);
+    std::getline(file, line);
+    const unsigned int cols = std::strtoul(line.data(), nullptr, 10);
+    // TODO: Create Tensor
+    //Tensor resulted_tensor{rows, cols};
+
+    for (unsigned int row = 0; row < rows; ++row)
+    {
+        for (unsigned int col = 0; col < cols; ++col)
         {
-            binary_weight = scalar_t_to_binary_string(get(row, column));
-            file << " " << binary_weight;
+            std::array<char, 4> arr;
+            if (!file.read(arr.data(), sizeof(scalar_t)))
+            {
+                STELLAR_ERROR(std::cerr,
+                              "Premature End of File at row " + std::to_string(row));
+                file.close();
+                return;
+            }
+
+            scalar_t scalar;
+            std::memcpy(&scalar, arr.data(), sizeof(scalar_t));
+            set(row, col, scalar);
         }
-        file << "\n";
+    }
+    if (std::string dummy; file.read(dummy.data(), 1))
+    {
+        STELLAR_ERROR(std::cerr, "File is larger than expected (trailing characters)!\n");
+        file.close();
+        return;
     }
 
     file.close();

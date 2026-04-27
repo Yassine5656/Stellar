@@ -61,18 +61,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         case 1:
         {
             CLEAR_CONSOLE();
-            auto tensor = stellar::core::Tensor(25000, 25000);
+            auto tensor = stellar::core::Tensor(2050, 2050);
             tensor.fill_uniform(-5.5, 18.2, 2);
             tensor.dump();
             tensor.save_to_binary("/tmp/tensor.bin");
-            auto tensor_saved = stellar::core::Tensor(25000, 25000);
-            tensor_saved.fill_from_binary("/tmp/tensor.bin");
-            tensor_saved.dump();
             break;
         }
         case 2:
         {
             CLEAR_CONSOLE();
+            auto tensor_saved = stellar::core::Tensor(2050, 2050);
+            tensor_saved.fill_from_binary("/tmp/tensor.bin");
+            tensor_saved.dump();
             break;
         }
         case 3:
