@@ -1,0 +1,7 @@
+CompileFlags:
+  Add:
+    - "-fopenmp"
+    - "-I@GCC_INCLUDE_DIR@"
+
+  Remove:
+    - "-march=native"
