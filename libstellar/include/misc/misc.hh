@@ -1,7 +1,10 @@
 #ifndef MISC_H
 #define MISC_H
 
-#include <ostream>
+#include <iostream>
+
+#define STELLAR_ERROR(Msg)                                                               \
+    stellar::misc::log_error(std::cerr, __FILE__, __LINE__, __func__, Msg)
 
 namespace stellar::misc
 {
