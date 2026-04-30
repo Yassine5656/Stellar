@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include "misc/misc.hh"
+
 namespace stellar::core
 {
     using scalar_t = float;
@@ -35,20 +37,30 @@ namespace stellar::core
          * @brief General tensor constructor
          */
         Tensor(const unsigned int size, const unsigned int length)
-          : size_(size)
-          , length_(length)
+          : size_{size}
+          , length_{length}
           , elements_(size_ * length_)
-        {}
+        {
+            if (getSize() == 0 || getLength() == 0)
+            {
+                STELLAR_ERROR("invalid size/length.\n");
+            }
+        }
 
         /**
          * @param size Dimension
          * @brief Square tensor constructor
          */
         explicit Tensor(const unsigned int size)
-          : size_(size)
-          , length_(size)
+          : size_{size}
+          , length_{size}
           , elements_(size_ * length_)
-        {}
+        {
+            if (getSize() == 0 || getLength() == 0)
+            {
+                STELLAR_ERROR("invalid size/length.\n");
+            }
+        }
 
         /**
          * @param other Matrix to move
@@ -90,8 +102,11 @@ namespace stellar::core
          */
         [[nodiscard]] scalar_t get(const unsigned int row, const unsigned int col) const
         {
-            assert(row < size_ && col < length_);
-            return elements_[row * length_ + col];
+            if (row >= getSize() || col >= getLength())
+            {
+                STELLAR_ERROR("invalid row/col.\n");
+            }
+            return elements_[row * getLength() + col];
         }
 
         /**
@@ -103,8 +118,12 @@ namespace stellar::core
          */
         void set(const unsigned int row, const unsigned int col, const scalar_t val)
         {
-            assert(row < size_ && col < length_);
-            elements_[row * length_ + col] = val;
+            if (row >= getSize() || col >= getLength())
+            {
+                STELLAR_ERROR("invalid row/col.\n");
+            }
+
+            elements_[row * getLength() + col] = val;
         }
 
         /**
@@ -231,6 +250,7 @@ namespace stellar::core
         unsigned int size_;
         // Number of columns
         unsigned int length_;
+        // Data
         std::vector<scalar_t> elements_;
     };
 } // namespace stellar::core

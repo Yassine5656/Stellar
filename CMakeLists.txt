@@ -40,4 +40,16 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
         COMMENT "Copying 'compile_commands' to source root"
     )
     add_custom_target(copy_compile_commands ALL DEPENDS "${CMAKE_SOURCE_DIR}/compile_commands.json")
+    execute_process(
+        COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=include
+        OUTPUT_VARIABLE GCC_INCLUDE_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    configure_file(
+        ${CMAKE_SOURCE_DIR}/.clangd.in
+        ${CMAKE_SOURCE_DIR}/.clangd
+        @ONLY
+    )
 endif()
+
