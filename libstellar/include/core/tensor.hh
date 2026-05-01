@@ -32,33 +32,33 @@ namespace stellar::core
     {
       public:
         /**
-         * @param size Number of rows
-         * @param length Number of columns
+         * @param rows Number of rows
+         * @param cols Number of columns
          * @brief General tensor constructor
          */
-        Tensor(const unsigned int size, const unsigned int length)
-          : size_{size}
-          , length_{length}
-          , elements_(size_ * length_)
+        Tensor(const unsigned int rows, const unsigned int cols)
+          : shape_{rows, cols}
+          , size_{rows * cols}
+          , elements_(size_)
         {
-            if (getSize() == 0 || getLength() == 0)
+            if (getRows() == 0 || getCols() == 0)
             {
-                STELLAR_ERROR("invalid size/length.\n");
+                STELLAR_ERROR("invalid rows/cols number.\n");
             }
         }
 
         /**
-         * @param size Dimension
+         * @param size Size of the squared tensor
          * @brief Square tensor constructor
          */
         explicit Tensor(const unsigned int size)
-          : size_{size}
-          , length_{size}
-          , elements_(size_ * length_)
+          : shape_{size, size}
+          , size_{size * size}
+          , elements_(size * size)
         {
-            if (getSize() == 0 || getLength() == 0)
+            if (size == 0)
             {
-                STELLAR_ERROR("invalid size/length.\n");
+                STELLAR_ERROR("invalid size.\n");
             }
         }
 
@@ -72,27 +72,27 @@ namespace stellar::core
 
         /**
          * @param other Matrix to copy
-         * @param size Number of sub-tensor's rows
-         * @param length Number of sub-tensor's columns
+         * @param rows Number of sub-tensor's rows
+         * @param cols Number of sub-tensor's columns
          * @param row_begin First row to copy
          * @param column_begin First column to copy
          * @brief Copy sub-tensor constructor
          */
         Tensor(const Tensor& other,
-               unsigned int size,
-               unsigned int length,
+               unsigned int rows,
+               unsigned int cols,
                unsigned int row_begin,
                unsigned int column_begin);
 
         /**
          * @brief Return the number of tensor's rows
          */
-        [[nodiscard]] unsigned int getSize() const { return size_; }
+        [[nodiscard]] unsigned int getRows() const { return shape_.rows; }
 
         /**
          * @brief Return the number of tensor's columns
          */
-        [[nodiscard]] unsigned int getLength() const { return length_; }
+        [[nodiscard]] unsigned int getCols() const { return shape_.cols; }
 
         /**
          * @param row Row index
@@ -102,11 +102,11 @@ namespace stellar::core
          */
         [[nodiscard]] scalar_t get(const unsigned int row, const unsigned int col) const
         {
-            if (row >= getSize() || col >= getLength())
+            if (row >= getRows() || col >= getCols())
             {
                 STELLAR_ERROR("invalid row/col.\n");
             }
-            return elements_[row * getLength() + col];
+            return elements_[row * getCols() + col];
         }
 
         /**
@@ -118,12 +118,12 @@ namespace stellar::core
          */
         void set(const unsigned int row, const unsigned int col, const scalar_t val)
         {
-            if (row >= getSize() || col >= getLength())
+            if (row >= getRows() || col >= getCols())
             {
                 STELLAR_ERROR("invalid row/col.\n");
             }
 
-            elements_[row * getLength() + col] = val;
+            elements_[row * getCols() + col] = val;
         }
 
         /**
@@ -246,10 +246,17 @@ namespace stellar::core
         static scalar_t min(const Tensor& tensor);
 
       private:
-        // Number of rows
-        unsigned int size_;
-        // Number of columns
-        unsigned int length_;
+        // Tensor shape
+        struct shape
+        {
+            const unsigned int rows;
+            const unsigned int cols;
+            shape(const unsigned int rows_, const unsigned int cols_)
+              : rows{rows_}
+              , cols{cols_} {};
+        } shape_;
+        // Number of elements
+        const unsigned int size_;
         // Data
         std::vector<scalar_t> elements_;
     };
