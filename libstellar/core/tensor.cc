@@ -97,8 +97,6 @@ void Tensor::multiply(const Tensor& other)
                   temp * other.get(index, column);
         }
     }
-
-    *this = std::move(result);
 }
 
 void Tensor::multiplyScalar(scalar_t scalar)
