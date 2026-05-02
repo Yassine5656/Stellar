@@ -82,7 +82,7 @@ namespace stellar::core::tensor
          */
         Tensor(const Tensor& other) noexcept = default;
 
-        Tensor& operator=(Tensor&&) noexcept = default;
+        Tensor& operator=(Tensor&&) noexcept = delete;
 
         /**
          * @param other Matrix to copy

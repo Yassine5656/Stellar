@@ -32,14 +32,14 @@ namespace stellar::core::tensor::io
      * @param filename Path of the binary file
      * @brief Load the tensor from the binary file
     */
-    Tensor load_(Tensor& tensor, const std::string& filename);
+    void load_(Tensor& tensor, const std::string& filename);
 
     /**
      * @param tensor Tensor to save
      * @param filename Path of the binary file
      * @brief Save the tensor in the binary file
     */
-    Tensor save(Tensor& tensor, const std::string& filename);
+    void save(Tensor& tensor, const std::string& filename);
 } // namespace stellar::core::tensor::io
 
 #endif // ! IO_HH
