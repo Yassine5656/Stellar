@@ -12,19 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TENSOR_H
-#define TENSOR_H
+#ifndef TENSOR_HH
+#define TENSOR_HH
 
-#include <cassert>
-#include <string>
 #include <vector>
 
+#include "core/tensor/fwd.hh"
 #include "misc/misc.hh"
 
-namespace stellar::core
+namespace stellar::core::tensor
 {
-    using scalar_t = float;
-
     /**
      * @brief Tensor class used for deep learning purposes.
      */
@@ -40,6 +37,23 @@ namespace stellar::core
           : shape_{rows, cols}
           , size_{rows * cols}
           , elements_(size_)
+        {
+            if (getRows() == 0 || getCols() == 0)
+            {
+                STELLAR_ERROR("invalid rows/cols number.\n");
+            }
+        }
+
+        /**
+         * @param size Number of elements
+         * @param rows Number of rows
+         * @param cols Number of columns
+         * @attention Internal-Use Only constructor. It assumes: size = rows * cols
+         */
+        Tensor(const unsigned int size, const unsigned int rows, const unsigned int cols)
+          : shape_{rows, cols}
+          , size_{size}
+          , elements_(size)
         {
             if (getRows() == 0 || getCols() == 0)
             {
@@ -85,6 +99,11 @@ namespace stellar::core
                unsigned int column_begin);
 
         /**
+         * @brief Return the total number of Tensor's elements
+         */
+        [[nodiscard]] unsigned int getSize() const { return size_; }
+
+        /**
          * @brief Return the number of tensor's rows
          */
         [[nodiscard]] unsigned int getRows() const { return shape_.rows; }
@@ -93,6 +112,16 @@ namespace stellar::core
          * @brief Return the number of tensor's columns
          */
         [[nodiscard]] unsigned int getCols() const { return shape_.cols; }
+
+        /**
+         * @brief INTERNAL USE ONLY!
+         */
+        [[nodiscard]] scalar_t* unsafe_data() { return elements_.data(); }
+
+        /**
+         * @brief INTERNAL USE ONLY!
+         */
+        [[nodiscard]] const scalar_t* unsafe_data() const { return elements_.data(); }
 
         /**
          * @param row Row index
@@ -126,125 +155,6 @@ namespace stellar::core
             elements_[row * getCols() + col] = val;
         }
 
-        /**
-         * @brief Tensor addition by parallelism of calculations and cache optimization.
-         */
-        void add(const Tensor& other);
-
-        /**
-         * @brief Tensor substraction by parallelism of calculations and cache optimization.
-         */
-        void sub(const Tensor& other);
-
-        /**
-         * @brief Tensor product by parallelism of calculations and cache optimization.
-         */
-        void multiply(const Tensor& other);
-
-        /**
-         * @param scalar Scalar coefficient
-         * @brief Tensor scalar product
-         */
-        void multiplyScalar(scalar_t scalar);
-
-        /**
-         * @param scalar New value
-         * @brief Set all tensor elements to 'scalar'.
-         */
-        void fill_constant(scalar_t scalar);
-
-        /**
-         * @param scalar New value
-         * @brief Fill the main diagonal by 'scalar'.
-         */
-        void fill_diagonal(scalar_t scalar);
-
-        /**
-         * @brief Transform tensor to identity.
-         * Thus, the main diagonal is set to 1, and other elements to 0.
-         */
-        void fill_identity() { fill_diagonal(1); }
-
-        /**
-         * @param scalar value to be set
-         * @param upper_section Determines the section filled.
-         * If true, the upper section is filled.
-         * @brief Change in-place to diagonal tensor.
-         */
-        void fill_triangular(scalar_t scalar, bool upper_section);
-
-        /**
-         * @param begin First sequence element
-         * @param end Last sequence element
-         * @brief Fill tensor by an increasing sequence from begin to end
-         */
-        void fill_sequence(int begin, unsigned int end);
-
-        /**
-         * @param min Min range
-         * @param max Max range
-         * @param seed Seed random generator
-         * @brief Fill tensor with random values followed by uniform distribution.
-         */
-        void fill_uniform(scalar_t min, scalar_t max, unsigned int seed);
-
-        /**
-         * @param mean Mean
-         * @param stddev Standard deviation
-         * @param seed Seed random generator
-         * @brief Fill tensor with random values followed by normal distribution.
-         */
-        void fill_normal(scalar_t mean, scalar_t stddev, unsigned int seed);
-
-        /**
-         * @param seed Seed random generator
-         * @brief Fill tensor with random values followed by uniform distribution and xavier limit.
-         */
-        void fill_xavier_uniform(unsigned int seed);
-
-        /**
-         * @param seed Seed random generator
-         * @brief Fill tensor with random values followed by normal distribution and he standard deviation.
-         */
-        void fill_he_normal(unsigned int seed);
-
-        /**
-         * @brief Load the tensor from the binary file
-         * @param filename Path of the binary file
-         */
-        void fill_from_binary(const std::string& filename);
-
-        /**
-         * @brief Save the tensor in the binary file
-         * @param filename Path of the binary file
-         */
-        void save_to_binary(const std::string& filename) const;
-
-        /**
-         * @brief Print first/last rows/columns of tensor, with additional information.
-         */
-        void dump() const;
-
-        /**
-         * @brief Sum of tensor elements
-         */
-        static scalar_t sum(const Tensor& tensor);
-
-        /**
-         * @brief Mean of tensor elements
-         */
-        static scalar_t mean(const Tensor& tensor);
-
-        /**
-         * @brief Max of tensor elements
-         */
-        static scalar_t max(const Tensor& tensor);
-
-        /**
-         * @brief Min of tensor elements
-         */
-        static scalar_t min(const Tensor& tensor);
-
       private:
         // Tensor shape
         struct shape
@@ -260,6 +170,6 @@ namespace stellar::core
         // Data
         std::vector<scalar_t> elements_;
     };
-} // namespace stellar::core
+} // namespace stellar::core::tensor
 
-#endif // ! TENSOR_H
+#endif // ! TENSOR_HH
