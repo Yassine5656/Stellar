@@ -22,6 +22,11 @@ namespace stellar::core::tensor::ops
 {
     Tensor add(const Tensor& a, const Tensor& b)
     {
+        // Different dimensions
+        if (a.getRows() != b.getRows() || a.getCols() != b.getCols())
+        {
+            STELLAR_ERROR("addition forbidden\n");
+        }
         // Out-place tensor result
         Tensor result{a.getSize(), a.getRows(), a.getCols()};
 
@@ -46,6 +51,12 @@ namespace stellar::core::tensor::ops
 
     void add_(Tensor& a, const Tensor& b)
     {
+        // Different dimensions
+        if (a.getRows() != b.getRows() || a.getCols() != b.getCols())
+        {
+            STELLAR_ERROR("addition forbidden\n");
+        }
+
         auto a_data = a.unsafe_data();
         auto b_data = b.unsafe_data();
 
@@ -64,6 +75,12 @@ namespace stellar::core::tensor::ops
 
     Tensor sub(const Tensor& a, const Tensor& b)
     {
+        // Different dimensions
+        if (a.getRows() != b.getRows() || a.getCols() != b.getCols())
+        {
+            STELLAR_ERROR("substraction forbidden\n");
+        }
+
         // Out-place tensor result
         Tensor result{a.getSize(), a.getRows(), a.getCols()};
 
@@ -88,6 +105,12 @@ namespace stellar::core::tensor::ops
 
     void sub_(Tensor& a, const Tensor& b)
     {
+        // Different dimensions
+        if (a.getRows() != b.getRows() || a.getCols() != b.getCols())
+        {
+            STELLAR_ERROR("substraction forbidden\n");
+        }
+
         auto a_data = a.unsafe_data();
         auto b_data = b.unsafe_data();
 

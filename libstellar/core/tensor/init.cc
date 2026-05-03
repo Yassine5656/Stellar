@@ -120,6 +120,11 @@ namespace stellar::core::tensor::init
 
     void fill_uniform(Tensor& tensor, scalar_t min, scalar_t max, unsigned int seed)
     {
+        // Assert right values
+        if (min > max)
+        {
+            STELLAR_ERROR("min/max invalid.\n");
+        }
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
