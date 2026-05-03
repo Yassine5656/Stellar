@@ -26,7 +26,7 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel for default(none) shared(tensor, tensor_data, scalar) if (tensor.getRows() >= PARALLEL_THRESHOLD || tensor.getCols() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel for default(none) shared(tensor, tensor_data, scalar) if (tensor.getRows() >= PARALLEL_THRESHOLD)
         // clang-format on
         for (unsigned int i = 0; i < tensor.getRows() * tensor.getCols(); ++i)
             tensor_data[i] = scalar;
@@ -43,7 +43,7 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel for default(none) shared(tensor, tensor_data, scalar) if (tensor.getRows() >= PARALLEL_THRESHOLD || tensor.getCols() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel for default(none) shared(tensor, tensor_data, scalar) if (tensor.getRows() >= PARALLEL_THRESHOLD)
         // clang-format on
         for (unsigned int row = 0; row < tensor.getRows(); ++row)
         {
@@ -73,7 +73,7 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, scalar, upper_section, end_row) if (tensor.getRows() >= PARALLEL_THRESHOLD || tensor.getCols() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, scalar, upper_section, end_row) if (tensor.getRows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             // clang-format off
@@ -109,7 +109,7 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel for default(none) shared(tensor, tensor_data, begin, end) if (tensor.getCols() >= PARALLEL_THRESHOLD || tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel for default(none) shared(tensor, tensor_data, begin, end) if (tensor.getRows() >= PARALLEL_THRESHOLD)
         // clang-format on
         for (unsigned int index = 0; index < tensor.getSize(); ++index)
         {
@@ -123,7 +123,7 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, min, max, seed) if (tensor.getCols() >= PARALLEL_THRESHOLD || tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, min, max, seed) if (tensor.getRows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             const int thread_id = omp_get_thread_num();
@@ -144,7 +144,7 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, mean, stddev, seed) if (tensor.getCols() >= PARALLEL_THRESHOLD || tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, mean, stddev, seed) if (tensor.getRows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             const int thread_id = omp_get_thread_num();
@@ -167,7 +167,7 @@ namespace stellar::core::tensor::init
         scalar_t xavier_scalar =
           std::sqrt(6.0f / static_cast<scalar_t>(tensor.getRows() + tensor.getCols()));
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, xavier_scalar, seed) if (tensor.getCols() >= PARALLEL_THRESHOLD || tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, xavier_scalar, seed) if (tensor.getRows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             const int thread_id = omp_get_thread_num();
@@ -190,7 +190,7 @@ namespace stellar::core::tensor::init
 
         scalar_t he_scalar = std::sqrt(2.0f / static_cast<scalar_t>(tensor.getCols()));
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, he_scalar, seed) if (tensor.getCols() >= PARALLEL_THRESHOLD || tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, he_scalar, seed) if (tensor.getRows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             const int thread_id = omp_get_thread_num();

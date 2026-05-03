@@ -25,7 +25,7 @@ namespace stellar::core::tensor
                    const unsigned int row_begin,
                    const unsigned int column_begin)
       : shape_{rows, cols}
-      , size_(shape_.rows * shape_.cols)
+      , size_{shape_.rows * shape_.cols}
       , elements_(size_)
     {
         if (shape_.rows == 0 || shape_.cols == 0)

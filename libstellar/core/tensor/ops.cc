@@ -263,7 +263,7 @@ namespace stellar::core::tensor::ops
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, min) if (tensor.getCols() >= PARALLEL_THRESHOLD || tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, min) if (tensor.getRows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             scalar_t local_min = std::numeric_limits<scalar_t>::max();
