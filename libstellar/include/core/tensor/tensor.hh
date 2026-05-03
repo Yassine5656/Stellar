@@ -68,7 +68,7 @@ namespace stellar::core::tensor
         explicit Tensor(const unsigned int size)
           : shape_{size, size}
           , size_{size * size}
-          , elements_(size * size)
+          , elements_(size_)
         {
             if (size == 0)
             {
