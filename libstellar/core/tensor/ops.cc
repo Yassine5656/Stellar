@@ -147,11 +147,11 @@ namespace stellar::core::tensor::ops
         {
             for (unsigned int k = 0; k < a.getCols(); ++k)
             {
-                const unsigned int row_index = row * b.getCols();
-                const scalar_t temp          = a_data[row * a.getCols() + k];
+                const scalar_t temp = a_data[row * a.getCols() + k];
                 for (unsigned int col = 0; col < b.getCols(); ++col)
                 {
-                    result_data[row_index + col] += temp * b_data[row_index + col];
+                    result_data[row * b.getCols() + col] +=
+                      temp * b_data[k * b.getCols() + col];
                 }
             }
         }
