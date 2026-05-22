@@ -17,7 +17,7 @@
 #include <random>
 #include <omp.h>
 
-#include "core/tensor//tensor.hh"
+#include "core/tensor/tensor.hh"
 
 namespace stellar::core::tensor::init
 {
@@ -103,7 +103,7 @@ namespace stellar::core::tensor::init
         // Assert increasing sequence
         if (begin > static_cast<int>(end))
         {
-            STELLAR_ERROR("Tensor is not square one.\n");
+            STELLAR_ERROR("begin/end parameters invalid.\n");
         }
 
         auto tensor_data = tensor.unsafe_data();
