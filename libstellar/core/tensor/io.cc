@@ -143,6 +143,12 @@ namespace stellar::core::tensor::io
         std::getline(file, line);
         const unsigned int cols = std::strtoul(line.data(), nullptr, 10);
 
+        if (tensor.rows() != rows || tensor.cols() != cols)
+        {
+            file.close();
+            STELLAR_ERROR("Incompatible tensor format during save!\n");
+        }
+
         auto tensor_data = tensor.unsafe_data();
 
         for (unsigned int row = 0; row < rows; ++row)
