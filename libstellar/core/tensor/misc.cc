@@ -33,36 +33,36 @@ namespace stellar::core::tensor::misc
 
         std::cout << std::setprecision(PRECISION_RENDERED);
         // Dump dimensions
-        std::cout << "Tensor: [" << tensor.getRows() << " x " << tensor.getCols() << "]"
+        std::cout << "Tensor: [" << tensor.rows() << " x " << tensor.cols() << "]"
                   << "\n";
-        const unsigned int rows_rendered = std::min(MAX_ELM_RENDERED, tensor.getRows());
-        const unsigned int cols_rendered = std::min(MAX_ELM_RENDERED, tensor.getCols());
+        const unsigned int rows_rendered = std::min(MAX_ELM_RENDERED, tensor.rows());
+        const unsigned int cols_rendered = std::min(MAX_ELM_RENDERED, tensor.cols());
 
         // Dump tensor
         std::cout << "[" << "\n";
         for (unsigned int row = 0; row < rows_rendered; ++row)
         {
-            std::cout << std::setw(PADDING) << " " << tensor_data[row * tensor.getCols()];
+            std::cout << std::setw(PADDING) << " " << tensor_data[row * tensor.cols()];
             unsigned int col = 1;
             for (; col < cols_rendered; ++col)
             {
                 std::cout << ", " << std::setw(PADDING)
-                          << tensor_data[row * tensor.getCols() + col];
+                          << tensor_data[row * tensor.cols() + col];
             }
-            if (tensor.getCols() - cols_rendered > col)
+            if (tensor.cols() - cols_rendered > col)
             {
                 std::cout << ", " << std::setw(PADDING) << "...";
             }
-            for (col = std::max(col, tensor.getCols() - cols_rendered);
-                 col < tensor.getCols(); ++col)
+            for (col = std::max(col, tensor.cols() - cols_rendered); col < tensor.cols();
+                 ++col)
             {
                 std::cout << ", " << std::setw(PADDING)
-                          << tensor_data[row * tensor.getCols() + col];
+                          << tensor_data[row * tensor.cols() + col];
             }
             std::cout << "\n";
         }
 
-        if (tensor.getRows() - rows_rendered > rows_rendered)
+        if (tensor.rows() - rows_rendered > rows_rendered)
         {
             std::cout << " " << std::setw(PADDING) << "...";
             unsigned int col = 1;
@@ -70,37 +70,37 @@ namespace stellar::core::tensor::misc
             {
                 std::cout << ", " << std::setw(PADDING) << "...";
             }
-            if (tensor.getCols() - cols_rendered > col)
+            if (tensor.cols() - cols_rendered > col)
             {
                 std::cout << ", " << std::setw(PADDING) << "...";
             }
-            for (col = std::max(col, tensor.getCols() - cols_rendered);
-                 col < tensor.getCols(); ++col)
+            for (col = std::max(col, tensor.cols() - cols_rendered); col < tensor.cols();
+                 ++col)
             {
                 std::cout << ", " << std::setw(PADDING) << "...";
             }
             std::cout << "\n";
         }
 
-        for (unsigned int row = std::max(rows_rendered, tensor.getRows() - rows_rendered);
-             row < tensor.getRows(); ++row)
+        for (unsigned int row = std::max(rows_rendered, tensor.rows() - rows_rendered);
+             row < tensor.rows(); ++row)
         {
-            std::cout << std::setw(PADDING) << " " << tensor_data[row * tensor.getCols()];
+            std::cout << std::setw(PADDING) << " " << tensor_data[row * tensor.cols()];
             unsigned int col = 1;
             for (; col < cols_rendered; ++col)
             {
                 std::cout << ", " << std::setw(PADDING)
-                          << tensor_data[row * tensor.getCols() + col];
+                          << tensor_data[row * tensor.cols() + col];
             }
-            if (tensor.getCols() - cols_rendered > col)
+            if (tensor.cols() - cols_rendered > col)
             {
                 std::cout << ", " << std::setw(PADDING) << "...";
             }
-            for (col = std::max(col, tensor.getCols() - cols_rendered);
-                 col < tensor.getCols(); ++col)
+            for (col = std::max(col, tensor.cols() - cols_rendered); col < tensor.cols();
+                 ++col)
             {
                 std::cout << ", " << std::setw(PADDING)
-                          << tensor_data[row * tensor.getCols() + col];
+                          << tensor_data[row * tensor.cols() + col];
             }
             std::cout << "\n";
         }

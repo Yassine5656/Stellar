@@ -26,16 +26,16 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel for default(none) shared(tensor, tensor_data, scalar) if (tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel for default(none) shared(tensor, tensor_data, scalar) if (tensor.rows() >= PARALLEL_THRESHOLD)
         // clang-format on
-        for (unsigned int i = 0; i < tensor.getRows() * tensor.getCols(); ++i)
+        for (unsigned int i = 0; i < tensor.rows() * tensor.cols(); ++i)
             tensor_data[i] = scalar;
     }
 
     void fill_diagonal(Tensor& tensor, scalar_t scalar)
     {
         // Assert square tensor
-        if (tensor.getRows() != tensor.getCols())
+        if (tensor.rows() != tensor.cols())
         {
             STELLAR_ERROR("Tensor is not square one.\n");
         }
@@ -43,15 +43,15 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel for default(none) shared(tensor, tensor_data, scalar) if (tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel for default(none) shared(tensor, tensor_data, scalar) if (tensor.rows() >= PARALLEL_THRESHOLD)
         // clang-format on
-        for (unsigned int row = 0; row < tensor.getRows(); ++row)
+        for (unsigned int row = 0; row < tensor.rows(); ++row)
         {
             for (unsigned col = 0; col < row; ++col)
-                tensor_data[row * tensor.getCols() + col] = 0;
-            for (unsigned col = row + 1; col < tensor.getCols(); ++col)
-                tensor_data[row * tensor.getCols() + col] = 0;
-            tensor_data[row * tensor.getCols() + row] = scalar;
+                tensor_data[row * tensor.cols() + col] = 0;
+            for (unsigned col = row + 1; col < tensor.cols(); ++col)
+                tensor_data[row * tensor.cols() + col] = 0;
+            tensor_data[row * tensor.cols() + row] = scalar;
         }
     }
 
@@ -60,11 +60,11 @@ namespace stellar::core::tensor::init
     void fill_triangular(Tensor& tensor, scalar_t scalar, bool upper_section)
     {
         // Assert square matrix
-        if (tensor.getRows() != tensor.getCols())
+        if (tensor.rows() != tensor.cols())
         {
             STELLAR_ERROR("Tensor is not square one.\n");
         }
-        unsigned int end_row = tensor.getRows();
+        unsigned int end_row = tensor.rows();
         if (upper_section)
         {
             ++end_row;
@@ -73,26 +73,26 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, scalar, upper_section, end_row) if (tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, scalar, upper_section, end_row) if (tensor.rows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             // clang-format off
             #pragma omp for
             // clang-format on
-            for (unsigned int row = 0; row < tensor.getRows(); ++row)
+            for (unsigned int row = 0; row < tensor.rows(); ++row)
             {
                 for (unsigned int col = 0; col < row; ++col)
                 {
-                    tensor_data[row * tensor.getCols() + col] = 0;
+                    tensor_data[row * tensor.cols() + col] = 0;
                 }
                 unsigned int col = row;
                 if (!upper_section)
                 {
                     ++col;
                 }
-                for (; col < tensor.getRows(); ++col)
+                for (; col < tensor.rows(); ++col)
                 {
-                    tensor_data[row * tensor.getCols() + col] = scalar;
+                    tensor_data[row * tensor.cols() + col] = scalar;
                 }
             }
         }
@@ -109,9 +109,9 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel for default(none) shared(tensor, tensor_data, begin, end) if (tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel for default(none) shared(tensor, tensor_data, begin, end) if (tensor.rows() >= PARALLEL_THRESHOLD)
         // clang-format on
-        for (unsigned int index = 0; index < tensor.getSize(); ++index)
+        for (unsigned int index = 0; index < tensor.size(); ++index)
         {
             tensor_data[index] =
               static_cast<scalar_t>(begin + static_cast<int>(index % (end + 1)));
@@ -128,7 +128,7 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, min, max, seed) if (tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, min, max, seed) if (tensor.rows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             const int thread_id = omp_get_thread_num();
@@ -137,7 +137,7 @@ namespace stellar::core::tensor::init
             // clang-format off
             #pragma omp for
             // clang-format on
-            for (unsigned int index = 0; index < tensor.getSize(); ++index)
+            for (unsigned int index = 0; index < tensor.size(); ++index)
             {
                 tensor_data[index] = distribution(generator);
             }
@@ -149,7 +149,7 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, mean, stddev, seed) if (tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, mean, stddev, seed) if (tensor.rows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             const int thread_id = omp_get_thread_num();
@@ -158,7 +158,7 @@ namespace stellar::core::tensor::init
             // clang-format off
             #pragma omp for
             // clang-format on
-            for (unsigned int index = 0; index < tensor.getSize(); ++index)
+            for (unsigned int index = 0; index < tensor.size(); ++index)
             {
                 tensor_data[index] = distribution(generator);
             }
@@ -170,9 +170,9 @@ namespace stellar::core::tensor::init
         auto tensor_data = tensor.unsafe_data();
 
         scalar_t xavier_scalar =
-          std::sqrt(6.0f / static_cast<scalar_t>(tensor.getRows() + tensor.getCols()));
+          std::sqrt(6.0f / static_cast<scalar_t>(tensor.rows() + tensor.cols()));
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, xavier_scalar, seed) if (tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, xavier_scalar, seed) if (tensor.rows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             const int thread_id = omp_get_thread_num();
@@ -182,7 +182,7 @@ namespace stellar::core::tensor::init
             // clang-format off
             #pragma omp for
             // clang-format on
-            for (unsigned int index = 0; index < tensor.getSize(); ++index)
+            for (unsigned int index = 0; index < tensor.size(); ++index)
             {
                 tensor_data[index] = distribution(generator);
             }
@@ -193,9 +193,9 @@ namespace stellar::core::tensor::init
     {
         auto tensor_data = tensor.unsafe_data();
 
-        scalar_t he_scalar = std::sqrt(2.0f / static_cast<scalar_t>(tensor.getCols()));
+        scalar_t he_scalar = std::sqrt(2.0f / static_cast<scalar_t>(tensor.cols()));
         // clang-format off
-        #pragma omp parallel default(none) shared(tensor, tensor_data, he_scalar, seed) if (tensor.getRows() >= PARALLEL_THRESHOLD)
+        #pragma omp parallel default(none) shared(tensor, tensor_data, he_scalar, seed) if (tensor.rows() >= PARALLEL_THRESHOLD)
         // clang-format on
         {
             const int thread_id = omp_get_thread_num();
@@ -204,7 +204,7 @@ namespace stellar::core::tensor::init
             // clang-format off
             #pragma omp for
             // clang-format on
-            for (unsigned int index = 0; index < tensor.getSize(); ++index)
+            for (unsigned int index = 0; index < tensor.size(); ++index)
             {
                 tensor_data[index] = distribution(generator);
             }

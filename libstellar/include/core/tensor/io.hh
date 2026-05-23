@@ -39,7 +39,7 @@ namespace stellar::core::tensor::io
      * @param filename Path of the binary file
      * @brief Save the tensor in the binary file
     */
-    void save(Tensor& tensor, const std::string& filename);
+    void save(const Tensor& tensor, const std::string& filename);
 } // namespace stellar::core::tensor::io
 
 #endif // ! IO_HH

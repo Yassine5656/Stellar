@@ -20,15 +20,15 @@
 namespace stellar::core::tensor
 {
     Tensor::Tensor(const Tensor& other,
-                   const unsigned int rows,
-                   const unsigned int cols,
+                   const unsigned int rows_,
+                   const unsigned int cols_,
                    const unsigned int row_begin,
                    const unsigned int column_begin)
-      : shape_{rows, cols}
-      , size_{shape_.rows * shape_.cols}
+      : shape_{rows_, cols_}
+      , size_{rows_ * cols_}
       , elements_(size_)
     {
-        if (shape_.rows == 0 || shape_.cols == 0)
+        if (rows_ == 0 || cols_ == 0)
         {
             STELLAR_ERROR("invalid sub-dimension.\n");
         }

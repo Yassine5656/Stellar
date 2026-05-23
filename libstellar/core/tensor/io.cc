@@ -28,9 +28,7 @@ namespace stellar::core::tensor::io
     {
         inline void WRITE_STELLAR_HEADER(std::ostream& os, const Tensor& tensor)
         {
-            os << MAGIC_NUMBER << '\n'
-               << tensor.getRows() << '\n'
-               << tensor.getCols() << '\n';
+            os << MAGIC_NUMBER << '\n' << tensor.rows() << '\n' << tensor.cols() << '\n';
         }
 
         bool check_magic_number(std::ifstream& os)
@@ -49,7 +47,7 @@ namespace stellar::core::tensor::io
         }
     } // namespace
 
-    void save(Tensor& tensor, const std::string& filename)
+    void save(const Tensor& tensor, const std::string& filename)
     {
         std::ofstream file{filename, std::ios::binary};
         if (!file.is_open())
@@ -61,13 +59,13 @@ namespace stellar::core::tensor::io
 
         auto tensor_data = tensor.unsafe_data();
 
-        for (unsigned int row = 0; row < tensor.getRows(); ++row)
+        for (unsigned int row = 0; row < tensor.rows(); ++row)
         {
-            for (unsigned int column = 0; column < tensor.getCols(); ++column)
+            for (unsigned int column = 0; column < tensor.cols(); ++column)
             {
                 std::array<char, sizeof(scalar_t)> binary_weight;
                 binary_weight =
-                  scalar_t_to_bytes(tensor_data[row * tensor.getCols() + column]);
+                  scalar_t_to_bytes(tensor_data[row * tensor.cols() + column]);
                 for (unsigned int i = 0; i < sizeof(scalar_t); ++i)
                 {
                     file << binary_weight[i];
@@ -114,7 +112,7 @@ namespace stellar::core::tensor::io
 
                 scalar_t scalar;
                 std::memcpy(&scalar, arr.data(), sizeof(scalar_t));
-                result_data[row * result.getCols() + col] = scalar;
+                result_data[row * result.cols() + col] = scalar;
             }
         }
         if (std::string dummy; file.read(dummy.data(), 1))
@@ -161,7 +159,7 @@ namespace stellar::core::tensor::io
 
                 scalar_t scalar;
                 std::memcpy(&scalar, arr.data(), sizeof(scalar_t));
-                tensor_data[row * tensor.getCols() + col] = scalar;
+                tensor_data[row * tensor.cols() + col] = scalar;
             }
         }
         if (std::string dummy; file.read(dummy.data(), 1))
