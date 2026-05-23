@@ -14,9 +14,6 @@
 
 #include "core/tensor/tensor.hh"
 
-#include <cstring>
-#include <omp.h>
-
 namespace stellar::core::tensor
 {
     Tensor::Tensor(const Tensor& other,
