@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "misc/misc.hh"
+#include "core/tensor/tensor.hh"
 
-namespace stellar::misc
+namespace stellar::core::tensor
 {
-    inline void log_error(std::ostream& os,
-                          std::string_view file,
-                          const int line,
-                          std::string_view func,
-                          std::string_view msg)
+    Tensor::Tensor(const Tensor& other,
+                   const unsigned int rows_,
+                   const unsigned int cols_,
+                   const unsigned int row_begin,
+                   const unsigned int column_begin)
+      : shape_{rows_, cols_}
+      , size_{rows_ * cols_}
+      , elements_(size_)
     {
-        os << "[STELLAR][ERROR] [" << file << ":" << line << "] in " << func << ": "
-           << msg << std::endl;
-        throw std::runtime_error{""};
+        if (rows_ == 0 || cols_ == 0)
+        {
+            STELLAR_ERROR("invalid sub-dimension.\n");
+        }
     }
-} // namespace stellar::misc
+} // namespace stellar::core::tensor

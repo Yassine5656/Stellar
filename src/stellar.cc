@@ -14,7 +14,10 @@
 
 #include <iostream>
 
-#include "core/tensor.hh"
+#include "core/tensor/init.hh"
+#include "core/tensor/io.hh"
+#include "core/tensor/misc.hh"
+#include "core/tensor/tensor.hh"
 
 #define CLEAR_CONSOLE() std::cout << "\033[2J\033[H\n";
 
@@ -61,18 +64,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         case 1:
         {
             CLEAR_CONSOLE();
-            auto tensor = stellar::core::Tensor(2050, 2050);
-            tensor.fill_uniform(-5.5, 18.2, 2);
-            tensor.dump();
-            tensor.save_to_binary("/tmp/tensor.bin");
+            using namespace stellar::core;
+            tensor::Tensor tensor(2050, 2050);
+            tensor::init::fill_uniform(tensor, -5.5, 18.2, 2);
+            tensor::misc::dump(tensor);
+            tensor::io::save(tensor, "/tmp/tensor.bin");
             break;
         }
         case 2:
         {
             CLEAR_CONSOLE();
-            auto tensor_saved = stellar::core::Tensor(2050, 2050);
-            tensor_saved.fill_from_binary("/tmp/tensor.bin");
-            tensor_saved.dump();
+            using namespace stellar::core;
+            tensor::Tensor tensor_saved(2050, 2050);
+            tensor::io::load_(tensor_saved, "/tmp/tensor.bin");
+            tensor::misc::dump(tensor_saved);
             break;
         }
         case 3:

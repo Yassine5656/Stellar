@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "misc/misc.hh"
+#ifndef TENSOR_FWD_HH
+#define TENSOR_FWD_HH
 
-namespace stellar::misc
+namespace stellar::core::tensor
 {
-    inline void log_error(std::ostream& os,
-                          std::string_view file,
-                          const int line,
-                          std::string_view func,
-                          std::string_view msg)
-    {
-        os << "[STELLAR][ERROR] [" << file << ":" << line << "] in " << func << ": "
-           << msg << std::endl;
-        throw std::runtime_error{""};
-    }
-} // namespace stellar::misc
+    using scalar_t = float;
+
+    class Tensor;
+
+    constexpr unsigned int PARALLEL_THRESHOLD = 3000;
+} // namespace stellar::core::tensor
+
+#endif // ! TENSOR_FWD_HH

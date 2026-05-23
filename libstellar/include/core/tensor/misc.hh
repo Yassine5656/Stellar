@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "misc/misc.hh"
+#ifndef TENSOR_MISC_HH
+#define TENSOR_MISC_HH
 
-namespace stellar::misc
+#include "core/tensor/fwd.hh"
+
+namespace stellar::core::tensor::misc
 {
-    inline void log_error(std::ostream& os,
-                          std::string_view file,
-                          const int line,
-                          std::string_view func,
-                          std::string_view msg)
-    {
-        os << "[STELLAR][ERROR] [" << file << ":" << line << "] in " << func << ": "
-           << msg << std::endl;
-        throw std::runtime_error{""};
-    }
-} // namespace stellar::misc
+    /**
+     * @brief Print first/last rows/columns of tensor, with additional information.
+    */
+    void dump(const Tensor& tensor);
+} // namespace stellar::core::tensor::misc
+
+#endif // ! TENSOR_MISC_HH
